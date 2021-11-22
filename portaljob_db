@@ -1,0 +1,406 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 14.1
+-- Dumped by pg_dump version 14.1
+
+-- Started on 2021-11-19 13:49:10
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 213 (class 1259 OID 24625)
+-- Name: application; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.application (
+    application_id integer NOT NULL,
+    j_user_id integer NOT NULL,
+    jobs_id integer NOT NULL,
+    is_accepted boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public.application OWNER TO postgres;
+
+--
+-- TOC entry 218 (class 1259 OID 24640)
+-- Name: application_application_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.application ALTER COLUMN application_id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.application_application_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 211 (class 1259 OID 24596)
+-- Name: company_profile; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.company_profile (
+    c_profile_id integer NOT NULL,
+    c_user_id integer NOT NULL,
+    c_name character varying(255) NOT NULL,
+    c_address character varying(255) NOT NULL,
+    c_description character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.company_profile OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 24639)
+-- Name: company_profile_c_profile_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.company_profile ALTER COLUMN c_profile_id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.company_profile_c_profile_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 212 (class 1259 OID 24613)
+-- Name: jobs; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.jobs (
+    jobs_id integer NOT NULL,
+    jobs_name character varying(255) NOT NULL,
+    c_user_id integer NOT NULL,
+    jobs_description character varying(255) NOT NULL,
+    jobs_location character varying(255) NOT NULL,
+    jobs_type character varying(255) NOT NULL,
+    jobs_gender character varying(255) NOT NULL,
+    jobs_status character varying(255)
+);
+
+
+ALTER TABLE public.jobs OWNER TO postgres;
+
+--
+-- TOC entry 216 (class 1259 OID 24638)
+-- Name: jobs_jobs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.jobs ALTER COLUMN jobs_id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.jobs_jobs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 210 (class 1259 OID 24584)
+-- Name: jobseeker_profile; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.jobseeker_profile (
+    j_profile_id integer NOT NULL,
+    j_user_id integer NOT NULL,
+    j_name character varying(255) NOT NULL,
+    j_address character varying(255) NOT NULL,
+    j_contact bigint NOT NULL,
+    j_education character varying(255) NOT NULL,
+    j_experience character varying(255) NOT NULL
+);
+
+
+ALTER TABLE public.jobseeker_profile OWNER TO postgres;
+
+--
+-- TOC entry 215 (class 1259 OID 24637)
+-- Name: jobseeker_profile_j_profile_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.jobseeker_profile ALTER COLUMN j_profile_id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.jobseeker_profile_j_profile_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 209 (class 1259 OID 24577)
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    user_id integer NOT NULL,
+    username character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    password character varying(255) NOT NULL,
+    type character varying NOT NULL
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- TOC entry 214 (class 1259 OID 24636)
+-- Name: user_user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.users ALTER COLUMN user_id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.user_user_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- TOC entry 3344 (class 0 OID 24625)
+-- Dependencies: 213
+-- Data for Name: application; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.application (application_id, j_user_id, jobs_id, is_accepted) FROM stdin;
+1	2	1	f
+2	4	2	t
+3	2	3	f
+4	2	2	f
+\.
+
+
+--
+-- TOC entry 3342 (class 0 OID 24596)
+-- Dependencies: 211
+-- Data for Name: company_profile; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.company_profile (c_profile_id, c_user_id, c_name, c_address, c_description) FROM stdin;
+1	5	PT Telkom	Jakarta Pusat	Perusahaan jasa telekomunikasi indonesia
+3	1	PT Medcom	Jakarta Selatan	Perusahaan ini bergerak di bidang penyedia jasa telekomunikasi
+\.
+
+
+--
+-- TOC entry 3343 (class 0 OID 24613)
+-- Dependencies: 212
+-- Data for Name: jobs; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.jobs (jobs_id, jobs_name, c_user_id, jobs_description, jobs_location, jobs_type, jobs_gender, jobs_status) FROM stdin;
+1	Fullstack Dev	5	Bekerja sebagai fullstack dev 24x7	Bandung	IT	Pria/Wanita	\N
+2	Backend dev	1	Jadi backend	Newyork	IT	Pria	Available
+3	Backend Dev	1	Pekerjaan ini melibatkan Backend	Sukabumi	IT	Pria	Available
+\.
+
+
+--
+-- TOC entry 3341 (class 0 OID 24584)
+-- Dependencies: 210
+-- Data for Name: jobseeker_profile; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.jobseeker_profile (j_profile_id, j_user_id, j_name, j_address, j_contact, j_education, j_experience) FROM stdin;
+1	2	Nugie Prasetyo	Sumedang	6282219434275	S1 Teknik Komputer	Magang di PT X selama X tahun
+2	3	Rizki Nugraha	Subang	628221123333	S1 Kehutanan	Magang di perusahaan X selama X tahun
+3	4	Aldi Naufal	Banten	62822112232	S1 Sistem Informasi	Magang di starup hub selama x bulan
+\.
+
+
+--
+-- TOC entry 3340 (class 0 OID 24577)
+-- Dependencies: 209
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users (user_id, username, email, password, type) FROM stdin;
+1	employ33	nulla@rocketmail.com	gedung123	company
+2	singer33	nec.ante@rocketmail.com	gedung123	jobseeker
+3	pungent	tellus.aenean@rocketmail.com	gedung123	jobseeker
+4	coffless4	natoque@rocketmail.com	gedung123	jobseeker
+5	bluepeter77	tristique.senectus@rocketmail.com	gedung123	company
+6	blighterrios	posuere.at@rocketmail.com	gedung123	jobseeker
+8	hatsz	quis.urna@rocketmail.com	gedung123	company
+9	claime7	natoque.penatibus@rocketmail.com	gedung123	company
+10	wanting44	sit.amet@rocketmail.com	gedung123	company
+11	senseez	nec@rocketmail.com	gedung123	company
+12	plate	est@rocketmail.com	gedung123	company
+13	booby3	donec.feugiat@rocketmail.com	gedung123	jobseeker
+14	needful3	vulputate.posuere@rocketmail.com	gedung123	jobseeker
+16	sandboxeu	praesent.luctus@rocketmail.com	gedung123	jobseeker
+17	challenge44	nibh.lacinia@rocketmail.com	gedung123	jobseeker
+18	angle000	lorem.eu@rocketmail.com	gedung123	company
+20	marvo77	marvo88e@gmail.com	gedung123	company
+7	singer337	non.ante@rocketmail.com	gedung123	company
+15	pungent232	vivamus.nibh@rocketmail.com	gedung123	company
+19	prtmn99	pertamina@gmail.com	rahasia	company
+\.
+
+
+--
+-- TOC entry 3355 (class 0 OID 0)
+-- Dependencies: 218
+-- Name: application_application_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.application_application_id_seq', 4, true);
+
+
+--
+-- TOC entry 3356 (class 0 OID 0)
+-- Dependencies: 217
+-- Name: company_profile_c_profile_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.company_profile_c_profile_id_seq', 3, true);
+
+
+--
+-- TOC entry 3357 (class 0 OID 0)
+-- Dependencies: 216
+-- Name: jobs_jobs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.jobs_jobs_id_seq', 3, true);
+
+
+--
+-- TOC entry 3358 (class 0 OID 0)
+-- Dependencies: 215
+-- Name: jobseeker_profile_j_profile_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.jobseeker_profile_j_profile_id_seq', 3, true);
+
+
+--
+-- TOC entry 3359 (class 0 OID 0)
+-- Dependencies: 214
+-- Name: user_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.user_user_id_seq', 20, true);
+
+
+--
+-- TOC entry 3196 (class 2606 OID 24630)
+-- Name: application application_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.application
+    ADD CONSTRAINT application_pkey PRIMARY KEY (application_id);
+
+
+--
+-- TOC entry 3192 (class 2606 OID 24602)
+-- Name: company_profile company_profile_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.company_profile
+    ADD CONSTRAINT company_profile_pkey PRIMARY KEY (c_profile_id);
+
+
+--
+-- TOC entry 3194 (class 2606 OID 24619)
+-- Name: jobs jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.jobs
+    ADD CONSTRAINT jobs_pkey PRIMARY KEY (jobs_id);
+
+
+--
+-- TOC entry 3190 (class 2606 OID 24590)
+-- Name: jobseeker_profile profile_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.jobseeker_profile
+    ADD CONSTRAINT profile_pkey PRIMARY KEY (j_profile_id);
+
+
+--
+-- TOC entry 3186 (class 2606 OID 24583)
+-- Name: users user_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT user_pkey PRIMARY KEY (user_id);
+
+
+--
+-- TOC entry 3188 (class 2606 OID 24652)
+-- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_username_key UNIQUE (username);
+
+
+--
+-- TOC entry 3200 (class 2606 OID 24631)
+-- Name: application application_j_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.application
+    ADD CONSTRAINT application_j_user_id_fkey FOREIGN KEY (j_user_id) REFERENCES public.users(user_id);
+
+
+--
+-- TOC entry 3198 (class 2606 OID 24608)
+-- Name: company_profile company_profile_c_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.company_profile
+    ADD CONSTRAINT company_profile_c_user_id_fkey FOREIGN KEY (c_user_id) REFERENCES public.users(user_id) NOT VALID;
+
+
+--
+-- TOC entry 3199 (class 2606 OID 24620)
+-- Name: jobs jobs_c_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.jobs
+    ADD CONSTRAINT jobs_c_user_id_fkey FOREIGN KEY (c_user_id) REFERENCES public.users(user_id);
+
+
+--
+-- TOC entry 3197 (class 2606 OID 24591)
+-- Name: jobseeker_profile profile_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.jobseeker_profile
+    ADD CONSTRAINT profile_user_id_fkey FOREIGN KEY (j_user_id) REFERENCES public.users(user_id) NOT VALID;
+
+
+-- Completed on 2021-11-19 13:49:10
+
+--
+-- PostgreSQL database dump complete
+--
+
