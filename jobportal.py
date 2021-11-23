@@ -13,6 +13,22 @@ def conn():
                             database="JobPortal")
     return conn
 
+def connuser_id(usernames):
+    connection = conn()
+    cursor = connection.cursor()
+    query = "SELECT user_id from users WHERE username = %s"
+    cursor.execute(query,(usernames, ))
+    users_records = cursor.fetchone()[0]
+    return users_records
+
+def con_c_userid(jobs_id):
+    connection = conn()
+    cursor = connection.cursor()
+    query = "SELECT c_user_id from jobs WHERE jobs_id = %s"
+    cursor.execute(query,(jobs_id, ))
+    users_records = cursor.fetchone()[0]
+    return users_records
+
 def is_company():
     username = rq.authorization['username']
     connection = conn()
@@ -76,7 +92,6 @@ def signup():
             connection.close()
             print("PostgreSQL connection is closed")
             
-            
 # UPDATE USER DATA
 @app.route('/user/<string:unames>/update_user', methods=['PUT'])
 def update(unames):
@@ -98,14 +113,133 @@ def update(unames):
             cursor.execute(postgreSQL_select_Query,
                         (uname, mail, pasw, tipe, userExist))
             connection.commit()
-            return "Profile Updated Successfully"
+            return "User Updated Successfully"
 
         finally:
             if connection:
                 cursor.close()
                 connection.close()
                 print("PostgreSQL connection is closed")
-            
+
+# INPUT PROFILE JOBSEEKER
+@app.route('/user/jobseeker/input_profile', methods=['POST'])
+def input_j_profile():
+    if login() != "Login Berhasil":
+        return "Gagal Login"
+    else:
+        try:
+            A = rq.json
+            usernames = rq.authorization['username']
+            name = A["j_name"]
+            address = A["j_address"]
+            contact = A["j_contact"]
+            edu = A["j_education"]
+            exp = A["j_experience"]
+
+            connection = conn()
+            print("using python variable")
+            cursor = connection.cursor()
+            postgreSQL_select_Query = "INSERT INTO public.jobseeker_profile (j_user_id, j_name, j_address, j_contact, j_education, j_experience) VALUES ((SELECT user_id from users WHERE username = %s), %s, %s, %s, %s, %s)  ;"
+            cursor.execute(postgreSQL_select_Query,
+                        (usernames, name, address, contact, edu, exp))
+            connection.commit() 
+            return "User Input Successfully"
+
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()
+                print("PostgreSQL connection is closed")
+
+
+# UPDATE PROFILE JOBSEEKER
+@app.route('/user/jobseeker/update_profile', methods=['PUT'])
+def update_j_profile():
+    if login() != "Login Berhasil":
+        return "Gagal Login"
+    else:
+        try:
+            A = rq.json
+            usernames = rq.authorization['username']
+            name = A["j_name"]
+            address = A["j_address"]
+            contact = A["j_contact"]
+            edu = A["j_education"]
+            exp = A["j_experience"]
+
+            connection = conn()
+            print("using python variable")
+            cursor = connection.cursor()
+            postgreSQL_select_Query = "UPDATE public.jobseeker_profile SET j_name = %s, j_address = %s, j_contact = %s, j_education = %s, j_experience = %s WHERE j_user_id = (SELECT user_id from users WHERE username = %s) ;"
+            cursor.execute(postgreSQL_select_Query,
+                        (name, address, contact, edu, exp, usernames))
+            connection.commit() 
+            return "User Updated Successfully"
+
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()
+                print("PostgreSQL connection is closed")
+
+
+# INPUT PROFILE COMPANY
+@app.route('/user/company/input_profile', methods=['POST'])
+def input_c_profile():
+    if login() != "Login Berhasil" and is_company() == True:
+        return "Gagal Login"
+    else:
+        try:
+            A = rq.json
+            usernames = rq.authorization['username']
+            name = A["c_name"]
+            address = A["c_address"]
+            descr = A["c_description"]
+
+            connection = conn()
+            print("using python variable")
+            cursor = connection.cursor()
+            postgreSQL_select_Query = "INSERT INTO public.company_profile (c_user_id, c_name, c_address, c_description) VALUES ((SELECT user_id from users WHERE username = %s), %s, %s, %s)  ;"
+            cursor.execute(postgreSQL_select_Query,
+                        (usernames, name, address, descr))
+            connection.commit() 
+            return "User Input Successfully"
+
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()
+                print("PostgreSQL connection is closed")
+
+
+# UPDATE PROFILE COMPANY
+@app.route('/user/company/update_profile', methods=['PUT'])
+def update_c_profile():
+    if login() != "Login Berhasil" and is_company() == True:
+        return "Gagal Login"
+    else:
+        try:
+            A = rq.json
+            usernames = rq.authorization['username']
+            name = A["c_name"]
+            address = A["c_address"]
+            descr = A["c_description"]
+            connection = conn()
+            print("using python variable")
+            cursor = connection.cursor()
+            postgreSQL_select_Query = "UPDATE public.company_profile SET c_name = %s, c_address = %s, c_description = %s WHERE c_user_id = (SELECT user_id from users WHERE username = %s) ;"
+            cursor.execute(postgreSQL_select_Query,
+                        (name, address, descr, usernames))
+            connection.commit() 
+            return "User Updated Successfully"
+
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()
+                print("PostgreSQL connection is closed")
+
+
 # SEARCH USER
 @ app.route('/search_user', methods=['POST'])
 def search_user():
@@ -117,16 +251,17 @@ def search_user():
             print("using python variable")
             cursor = connection.cursor()
 
-            postgreSQL_select_Query = f"SELECT user_id, username, email FROM public.users WHERE username LIKE '%{usernames}%'  "
+            postgreSQL_select_Query = f"SELECT user_id, username, email, type FROM public.users WHERE username LIKE '%{usernames}%'  "
             cursor.execute(postgreSQL_select_Query)
             users_records = cursor.fetchall()
 
             print("Print each row and it's columns values")
             for row in users_records:
                 arr.append(
-                    {"1. id": row[0],
-                    "2. name": row[1],
-                    "3. email": row[2]})
+                    {"id": row[0],
+                    "name": row[1],
+                    "email": row[2],
+                    "type" : row[3]})
             return jsonify(arr)
 
         finally:
@@ -143,8 +278,8 @@ def jobs():
     if login() == 'Login Berhasil' and is_company() == True:
         try:
             A = rq.json
-            job = A['job']
             c_id = rq.authorization['username']
+            job = A['job']
             descr = A['description']
             loc = A['location']
             tipe = A['type']
@@ -153,7 +288,7 @@ def jobs():
             connection = conn()
             print("using python variable")
             cursor = connection.cursor()
-            postgreSQL_select_Query = "INSERT INTO public.jobs(jobs_name, c_user_id, jobs_description, jobs_location, jobs_type, jobs_gender, jobs_status) VALUES (%s, (SELECT jobs.c_user_id FROM jobs JOIN users ON users.user_id = jobs.c_user_id WHERE users.username = %s), %s, %s, %s, %s, %s);"
+            postgreSQL_select_Query = "INSERT INTO public.jobs(jobs_name, c_user_id, jobs_description, jobs_location, jobs_type, jobs_gender, jobs_status) VALUES (%s, (SELECT user_id FROM users WHERE users.username = %s), %s, %s, %s, %s, %s);"
             cursor.execute(postgreSQL_select_Query, (job, c_id, descr, loc, tipe, gen, stat))
             connection.commit()
             logger.debug(postgreSQL_select_Query)
@@ -210,10 +345,9 @@ def get_jobs():
         return 'Permission Denied'
 
 
-
 # GET ALL JOB
 @ app.route('/timeline/get_all_jobs', methods=['GET'])
-def get_job():
+def get_all_job():
     if login() == 'Login Berhasil' and is_company() == True:
         try:
             arr = []
@@ -265,11 +399,14 @@ def edit_jobs():
             connection = conn()
             print("using python variable")
             cursor = connection.cursor()
-            postgreSQL_select_Query = "UPDATE jobs SET jobs_name = %s, jobs_description = %s, jobs_location = %s, jobs_type = %s, jobs_gender = %s, jobs_status = %s WHERE c_user_id = (SELECT user_id from users WHERE username = %s ) AND jobs_id = %s;"
-            cursor.execute(postgreSQL_select_Query,
-                        (name, descr, loc, tipe, gen, stat, usernames, jobs_id))
-            connection.commit()
-            return "Jobs Updated Successfully"
+            if str(connuser_id(usernames)) != str(con_c_userid(jobs_id)):
+                return "Username dan jobs_id tidak sama"
+            else:
+                postgreSQL_select_Query = "UPDATE jobs SET jobs_name = %s, jobs_description = %s, jobs_location = %s, jobs_type = %s, jobs_gender = %s, jobs_status = %s WHERE c_user_id = (SELECT user_id from users WHERE username = %s ) AND jobs_id = %s;"
+                cursor.execute(postgreSQL_select_Query,
+                            (name, descr, loc, tipe, gen, stat, usernames, jobs_id))
+                connection.commit()
+                return "Jobs Updated Successfully"
 
         finally:
             if connection:
@@ -282,7 +419,7 @@ def edit_jobs():
 # LIST ALL AVAILABLE JOB
 @ app.route('/timeline/list_available_jobs', methods=['GET'])
 def list_job():
-    if login() == 'Login Berhasil':
+    if login() == 'Login Berhasil' and is_company() != True:
         try:
             arr = []
             usernames = rq.authorization['username']
@@ -321,7 +458,7 @@ def list_job():
 # LOCATION, TYPE, GENDER
 @ app.route('/search_jobs', methods=['POST'])
 def search_jobs():
-    if login() == 'Login Berhasil':
+    if login() == 'Login Berhasil' and is_company() != True:
         connection = conn() 
         try:
 
@@ -380,8 +517,8 @@ def search_jobs():
 
 # GET A JOB DETAIL
 @app.route('/timeline/get_jobs_detail', methods=['GET'])
-def get_a_job():
-    if login() == 'Login Berhasil':
+def get_a_jobdetail():
+    if login() == 'Login Berhasil' and is_company() != True:
         try:
             arr = []
             # usernames = rq.authorization['username']
@@ -422,7 +559,7 @@ def get_a_job():
 # APPLY A JOB
 @ app.route('/timeline/apply_job', methods=['POST'])
 def apply_job():
-    if login() == "Login Berhasil":
+    if login() == "Login Berhasil" and is_company() != True:
         try:
             A = rq.json
             user_id = rq.authorization['username']
@@ -447,31 +584,31 @@ def apply_job():
         return 'Permission Denied'
 
 # LIST ALL APPLIED JOB AND STATUS
-@ app.route('/timeline/applied_jobs', methods=['GET'])
-def applied_job():
-    if login() == 'Login Berhasil':
+@ app.route('/timeline/<string:usernames>/applied_jobs', methods=['GET'])
+def applied_job(usernames):
+    if login() == 'Login Berhasil' and is_company() != True:
         try:
             arr = []
-            # usernames = rq.authorization['username']
-            id_jobseeker = rq.args.get('user_id')
+            usernames = rq.authorization['username']
+            # id_jobseeker = rq.args.get('j_user_id')
             connection = conn()
             print("using python variable")
             cursor = connection.cursor()
 
-            postgreSQL_select_Query = "SELECT jobs.jobs_id, jobs.jobs_name, jobs.c_user_id, jobs.jobs_description, jobs.jobs_location, jobs.jobs_type, jobs.jobs_gender, jobs.jobs_status, application.j_user_id, application.is_accepted FROM jobs INNER JOIN application ON application.jobs_id = jobs.jobs_id WHERE application.j_user_id = %s "
-            cursor.execute(postgreSQL_select_Query, (id_jobseeker))
+            postgreSQL_select_Query = "SELECT jobs.jobs_id, jobs.jobs_name, jobs.c_user_id, jobs.jobs_description, jobs.jobs_location, jobs.jobs_type, jobs.jobs_gender, jobs.jobs_status, application.j_user_id, application.is_accepted FROM jobs INNER JOIN application ON application.jobs_id = jobs.jobs_id WHERE application.j_user_id = (SELECT user_id from users WHERE username = %s ) "
+            cursor.execute(postgreSQL_select_Query, (usernames,))
             users_records = cursor.fetchall()
 
             print("Print each row and it's columns values")
             for row in users_records:
-                arr.append({"1. jobs_id": row[0], 
-                            "2. jobs_name": row[1],
-                            "3. c_user_id": row[2],
-                            "4. jobs_description": row[3],
-                            "5. jobs_location": row[4],
-                            "6. jobs_type": row[5],
-                            "7. jobs_gender": row[6],
-                            "8. jobs_status": row[7]
+                arr.append({"jobs_id": row[0], 
+                            "jobs_name": row[1],
+                            "c_user_id": row[2],
+                            "jobs_description": row[3],
+                            "jobs_location": row[4],
+                            "jobs_type": row[5],
+                            "jobs_gender": row[6],
+                            "jobs_status": row[7]
                             })
             return jsonify(arr)
         except (Exception, psycopg2.Error) as error:
@@ -497,19 +634,19 @@ def jobseeker_profile():
             cursor = connection.cursor()
             postgreSQL_select_Query = "SELECT jobseeker_profile.* FROM jobseeker_profile INNER JOIN users ON users.user_id = jobseeker_profile.j_user_id WHERE j_user_id = %s "
 
-            cursor.execute(postgreSQL_select_Query, (id_jobseeker))
+            cursor.execute(postgreSQL_select_Query, (id_jobseeker,))
             print("Selecting rows from mobile table using cursor.fetchall")
             users_records = cursor.fetchall()
 
             print("Print each row and it's columns values")
             for row in users_records:
-                arr.append({"1. j_profile_id": row[0], 
-                            "2. j_user_id": row[1],
-                            "3. j_name": row[2],
-                            "4. j_address": row[3],
-                            "5. j_contact": row[4],
-                            "6. j_education": row[5],
-                            "7. j_experience": row[6],
+                arr.append({"j_profile_id": row[0], 
+                            "j_user_id": row[1],
+                            "j_name": row[2],
+                            "j_address": row[3],
+                            "j_contact": row[4],
+                            "j_education": row[5],
+                            "j_experience": row[6],
                             })
             return jsonify(arr)
 
@@ -532,24 +669,26 @@ def list_applicant():
         try:
             arr = []
             # usernames = rq.authorization['username']
-            jobs = rq.args.get('job_id')
+            jobs = rq.args.get('jobs_id')
             connection = conn()
             print("using python variable")
             cursor = connection.cursor()
             
-            postgreSQL_select_Query = "SELECT jobs.jobs_name, jobs.c_user_id, jobs.jobs_description, jobs.jobs_location, jobs.jobs_type, jobs.jobs_gender, jobs.jobs_status FROM jobs INNER JOIN application ON application.jobs_id = jobs.jobs_id WHERE jobs.jobs_id = %s "
-            cursor.execute(postgreSQL_select_Query, (jobs))
+            postgreSQL_select_Query = "SELECT jp.j_user_id, jp.j_name, jp.j_address, jp.j_contact, jp.j_education, jp.j_experience FROM application INNER JOIN jobseeker_profile AS jp ON jp.j_user_id = application.j_user_id  WHERE jobs_id = %s "
+            cursor.execute(postgreSQL_select_Query, (jobs,))
             users_records = cursor.fetchall()
-            
+            logger.debug(users_records)
             print("Print each row and it's columns values")
             for row in users_records:
                 arr.append({
-                            "1. application_id": row[0],
-                            "2. j_user_id": row[1],
-                            "3. jobs_id": row[2],
-                            "4. is_accepted": row[3]
+                            "j_user_id": row[0],
+                            "j_name": row[1],
+                            "j_address": row[2],
+                            "j_contact": row[3],
+                            "j_education" : row[4],
+                            "j_experience" : row[5] 
                             })
-                return jsonify(arr)
+            return jsonify(arr)
         except (Exception, psycopg2.Error) as error:
             return "Error while fetching data from PostgreSQL"
         
