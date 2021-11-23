@@ -1,0 +1,20 @@
+INSERT INTO user (username,email,password,type)
+VALUES
+  ('employ33','nulla@rocketmail.com','gedung123','company'),
+  ('singer33','nec.ante@rocketmail.com','gedung123','jobseeker'),
+  ('pungent','tellus.aenean@rocketmail.com','gedung123','jobseeker'),
+  ('coffless4','natoque@rocketmail.com','gedung123','jobseeker'),
+  ('bluepeter77','tristique.senectus@rocketmail.com','gedung123','company'),
+  ('blighterrios','posuere.at@rocketmail.com','gedung123','jobseeker'),
+  ('singer33','non.ante@rocketmail.com','gedung123','company'),
+  ('hatsz','quis.urna@rocketmail.com','gedung123','company')
+  ('claime7','natoque.penatibus@rocketmail.com','gedung123','company'),
+  ('wanting44','sit.amet@rocketmail.com','gedung123','company'),
+  ('senseez','nec@rocketmail.com','gedung123','company'),
+  ('plate','est@rocketmail.com','gedung123','company'),
+  ('booby3','donec.feugiat@rocketmail.com','gedung123','jobseeker'),
+  ('needful3','vulputate.posuere@rocketmail.com','gedung123','jobseeker'),
+  ('pungent','vivamus.nibh@rocketmail.com','gedung123','company')
+  ('sandboxeu','praesent.luctus@rocketmail.com','gedung123','jobseeker'),
+  ('challenge44','nibh.lacinia@rocketmail.com','gedung123','jobseeker'),
+  ('angle000','lorem.eu@rocketmail.com','gedung123','company');
